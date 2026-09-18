@@ -62,29 +62,50 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Check Gradle
+        shell: bash
+        run: |
+          gradle --version
+          java -version
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+
       - name: Build APK
         shell: bash
         run: |
           set +e
 
-          gradle assembleDebug --no-daemon --stacktrace --info 2>&1 | tee build.log
+          gradle assembleDebug \
+            --no-daemon \
+            --no-build-cache \
+            --stacktrace \
+            --info \
+            2>&1 | tee build.log
 
           EXIT_CODE=${PIPESTATUS[0]}
 
           echo ""
           echo "========================================"
-          echo "        BUILD ERROR SUMMARY"
+          echo "       IMPORTANT BUILD INFORMATION"
           echo "========================================"
 
           echo ""
-          echo "===== LAST 300 LINES ====="
-          tail -300 build.log || true
+          echo "===== GRADLE VERSION ====="
+          gradle --version | head -20
 
           echo ""
-          echo "===== ERROR LINES ====="
-          grep -Ein \
-            "error:|FAILURE:|What went wrong:|Execution failed|Could not|AAPT|Duplicate class|Manifest merger failed|resource .* not found|Compilation failed" \
-            build.log | tail -150 || true
+          echo "===== FAILURE SECTION ====="
+          grep -n -B 30 -A 100 "What went wrong:" build.log | tail -150 || true
+
+          echo ""
+          echo "===== EXCEPTION SECTION ====="
+          grep -n -B 10 -A 30 \
+            "Exception\|Caused by:\|AAPT\|Manifest merger failed\|Duplicate class\|resource .* not found" \
+            build.log | tail -200 || true
+
+          echo ""
+          echo "===== LAST 200 LINES ====="
+          tail -200 build.log || true
 
           echo ""
           echo "===== GRADLE EXIT CODE ====="
