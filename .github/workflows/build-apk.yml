@@ -52,6 +52,7 @@ jobs:
 
           if [ ! -f app/google-services.json ]; then
             python3 -c 'import json; data={"project_info":{"project_number":"000000000000","project_id":"maw3idi-build","storage_bucket":"maw3idi-build.appspot.com"},"client":[{"client_info":{"mobilesdk_app_id":"1:000000000000:android:0000000000000000","android_client_info":{"package_name":"com.maw3idi.app"}},"api_key":[{"current_key":"AIzaSyDummyKeyForBuildOnly"}]}],"configuration_version":"1"}; open("app/google-services.json","w").write(json.dumps(data, indent=2))'
+
           fi
 
           echo "Firebase config prepared successfully."
@@ -59,7 +60,7 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.10.2'
+          gradle-version: '8.9'
 
       - name: Build APK
         shell: bash
@@ -76,14 +77,14 @@ jobs:
           echo "========================================"
 
           echo ""
-          echo "===== LAST 250 LINES ====="
-          tail -250 build.log || true
+          echo "===== LAST 300 LINES ====="
+          tail -300 build.log || true
 
           echo ""
           echo "===== ERROR LINES ====="
           grep -Ein \
             "error:|FAILURE:|What went wrong:|Execution failed|Could not|AAPT|Duplicate class|Manifest merger failed|resource .* not found|Compilation failed" \
-            build.log | tail -100 || true
+            build.log | tail -150 || true
 
           echo ""
           echo "===== GRADLE EXIT CODE ====="
