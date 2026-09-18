@@ -43,14 +43,38 @@ jobs:
             "platforms;android-35" \
             "build-tools;35.0.0"
 
-      - 
-name: Prepare Firebase config
+      - name: Prepare Firebase config
         run: |
+          mkdir -p app
+
           if [ ! -f app/google-services.json ]; then
-            cp app/google-services.json.example app/google-services.json
+            cat > app/google-services.json <<'EOF'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "maw3idi-build",
+              "storage_bucket": "maw3idi-build.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+                  "android_client_info": {
+                    "package_name": "com.maw3idi.app"
+                  }
+                },
+                "api_key": [
+                  {
+                    "current_key": "AIzaSyDummyKeyForBuildOnly"
+                  }
+                ]
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
           fi
 
-          
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
