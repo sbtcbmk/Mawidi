@@ -26,8 +26,10 @@ jobs:
           packages: ''
 
       - name: Prepare Android SDK
+        shell: bash
         run: |
           SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME}}"
+
           SDKMANAGER="$SDK/cmdline-tools/latest/bin/sdkmanager"
 
           if [ ! -x "$SDKMANAGER" ]; then
@@ -44,48 +46,8 @@ jobs:
             "build-tools;35.0.0"
 
       - name: Prepare Firebase config
+        shell: bash
         run: |
           mkdir -p app
 
-          if [ ! -f app/google-services.json ]; then
-            cat > app/google-services.json <<'EOF'
-          {
-            "project_info": {
-              "project_number": "000000000000",
-              "project_id": "maw3idi-build",
-              "storage_bucket": "maw3idi-build.appspot.com"
-            },
-            "client": [
-              {
-                "client_info": {
-                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
-                  "android_client_info": {
-                    "package_name": "com.maw3idi.app"
-                  }
-                },
-                "api_key": [
-                  {
-                    "current_key": "AIzaSyDummyKeyForBuildOnly"
-                  }
-                ]
-              }
-            ],
-            "configuration_version": "1"
-          }
-          EOF
-          fi
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.10.2'
-
-      - name: Build APK
-        run: |
-          gradle assembleDebug --no-daemon --stacktrace --info
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Maw3idi-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          if [ !
